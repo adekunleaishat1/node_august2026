@@ -25,7 +25,6 @@ const userschema = mongoose.Schema({
 })
 
 const usermodel = mongoose.model("user_collection", userschema)
-
 const gender = "male"
 const users = []
 let username = ""
@@ -64,8 +63,6 @@ app.get("/login",(req, res)=>{
 app.get("/dashboard",(req , res)=>{
    res.render("dashboard", {username})
 })
-
-
 app.post("/user/signup", async(req, res)=>{
   try {
     const newuser =  await usermodel.create(req.body)
@@ -84,7 +81,6 @@ app.post("/user/signup", async(req, res)=>{
      res.send(error.message)
   }
 })
-
 app.post("/user/login",(req , res)=>{
     console.log(req.body);
     const {email , password} = req.body
@@ -122,5 +118,4 @@ const port = 8006
 
 app.listen(port,()=>{
  console.log(`app started at port ${port}`);
- 
 })
