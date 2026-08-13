@@ -1,12 +1,4 @@
-// const users = ["john","nafisat", "itiayo", "itunu","muheez", "taiwo"]
 
-// function adduser(user) {
-//     users.push(user)
-//     console.log(users);
-    
-// }
-
-// adduser("eniola")
 
 const express = require("express")
 const app = express()
