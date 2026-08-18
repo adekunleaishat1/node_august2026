@@ -25,6 +25,17 @@ const userschema = mongoose.Schema({
 })
 
 const usermodel = mongoose.model("user_collection", userschema)
+
+const todoschema = mongoose.Schema({
+  title:{type:String, trim:true, required:true},
+  description:{type :String, trim:true, required:true},
+  completed:{type:Boolean, default:false},
+  user:{type:String, required:true, unique:true}
+ })
+
+ const todomodel = mongoose.model("todos", todoschema)
+
+
 const gender = "male"
 const users = []
 let username = ""
@@ -60,9 +71,19 @@ app.get("/login",(req, res)=>{
    res.render("login")
 })
 
-app.get("/dashboard",(req , res)=>{
-   res.render("dashboard", {username})
+app.get("/dashboard",async(req , res)=>{
+try {
+    const alltodo = await todomodel.find()
+    console.log(alltodo);
+    
+   res.render("dashboard", {username, alltodo})
+} catch (error) {
+  if (error) {
+    return res.send("An error occured")
+  }
+}
 })
+
 app.post("/user/signup", async(req, res)=>{
   try {
     const newuser =  await usermodel.create(req.body)
@@ -81,20 +102,53 @@ app.post("/user/signup", async(req, res)=>{
      res.send(error.message)
   }
 })
-app.post("/user/login",(req , res)=>{
-    console.log(req.body);
+app.post("/user/login", async(req , res)=>{
+
+  try {
+      console.log(req.body);
     const {email , password} = req.body
     if (!email || !password) {
       return res.send("All fields are mandatory")
     }
-  const existuser = users.find((user)=> user.email == email)
-  console.log(existuser);
-  if (existuser  && existuser.password == password) {
-    username = existuser.username
-   return res.redirect("/dashboard")
+   const existuser = await usermodel.findOne({email})
+   if (existuser && existuser.password == password) {
+     username = existuser.username
+    return res.redirect("/dashboard")
+   }
+   return res.send("Invalid email or password")
+  } catch (error) {
+     console.log(error);
+     
   }
-  return res.send("invalid email or password") 
+  
+  // const existuser = users.find((user)=> user.email == email)
+  // console.log(existuser);
+  // if (existuser  && existuser.password == password) {
+  //   username = existuser.username
+  //  return res.redirect("/dashboard")
+  // }
+  // return res.send("invalid email or password") 
 })
+
+app.post("/addtodo/:username", async(req , res)=>{
+try {
+  console.log(req.body);
+  console.log(req.params);
+  const {username} = req.params
+const newtodo =  await todomodel.create({...req.body , user:username})
+console.log(newtodo);
+if (newtodo) {
+ return res.redirect("/dashboard")
+}
+} catch (error) {
+  console.log(error);
+  
+}
+})
+
+
+
+
 
 
 const Uri = process.env.MONGODB_URI
