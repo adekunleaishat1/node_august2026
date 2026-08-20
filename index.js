@@ -30,8 +30,8 @@ const todoschema = mongoose.Schema({
   title:{type:String, trim:true, required:true},
   description:{type :String, trim:true, required:true},
   completed:{type:Boolean, default:false},
-  user:{type:String, required:true, unique:true}
- })
+  user:{type:String, required:true}
+})
 
  const todomodel = mongoose.model("todos", todoschema)
 
@@ -146,7 +146,41 @@ if (newtodo) {
 }
 })
 
+app.post("/deletetodo/:id", async(req ,res)=>{
+   try {
+      console.log(req.params);
+      const {id} = req.params
+    
+    const deletedtodo =  await todomodel.findByIdAndDelete(id)
+    if (deletedtodo) {
+      return res.redirect("/dashboard")
+    }
+   } catch (error) {
+    console.log(error);
+    
+   }
+})
 
+app.post("/updatetodo/:id",async(req ,res)=>{
+  try {
+    const {id} = req.params
+    console.log(req.body);
+    
+    const { completed } = req.body
+
+   const updatedtodo =  await todomodel.findByIdAndUpdate(id,
+    {completed:!completed},
+    {new:true}
+   )
+   if (updatedtodo) {
+    res.redirect("/dashboard")
+   }
+   
+  } catch (error) {
+    console.log(error);
+    
+  }
+})
 
 
 

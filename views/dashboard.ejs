@@ -18,5 +18,28 @@
     </form>
 
 
+
+    <% if (username == "tholai") { %>
+        <p>Na woman you be </p>
+    <% } else {%>
+       <p>Na man you be </p>
+    <% }  %>
+       
+<% alltodo.forEach((element ,index)=> { %>
+    <p><%= index + 1 %></p>
+    <p><%= element.title %></p>
+    <p><%= element.description %></p>
+
+   <form action="/updatetodo/<%= element._id %>" method="post">
+    <input value=<%= element.completed %> name="completed" type="text" hidden>
+     <input type="checkbox"  onchange="this.form.submit()" <%= element.completed && "checked" %> >
+   </form>
+
+    <form action="/deletetodo/<%= element._id  %>" method="post">
+       <button>delete</button>
+    </form> 
+    
+<% }) %>
+
 </body>
 </html>
