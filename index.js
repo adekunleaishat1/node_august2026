@@ -5,6 +5,8 @@ const app = express()
 const ejs =require("ejs")
 const mongoose = require("mongoose")
 const dotenv = require("dotenv").config()
+const connect = require("./Database/db.connect")
+const {displayslashroute, getuser, displaysignup} = require("./controller/user.controller")
 
 
 // CRUD CREATE READ UPDATE AND DELETE 
@@ -18,54 +20,21 @@ app.set("view engine", "ejs")
 app.use(express.urlencoded())
 
 
-const userschema = mongoose.Schema({
-   username:{type:String,trim:true,required:true},
-   email:{type:String,trim:true ,unique:true,required:true},
-   password:{type:String,trim:true,required:true}
-})
-
-const usermodel = mongoose.model("user_collection", userschema)
-
-const todoschema = mongoose.Schema({
-  title:{type:String, trim:true, required:true},
-  description:{type :String, trim:true, required:true},
-  completed:{type:Boolean, default:false},
-  user:{type:String, required:true}
-})
-
- const todomodel = mongoose.model("todos", todoschema)
 
 
 const gender = "male"
 const users = []
 let username = ""
-app.get("/",(request, response)=>{
-  response.send("Welcome to your node class")
-})
+
+app.get("/", displayslashroute)
+
 app.get("/home",(req , res)=>{
    res.render("index",{gender})
 })
 
-app.get("/user",(req, res)=>{
-//    res.send("This is shola")
-res.json({
-    user:[
-        {name:"John", class:"Nodejs",favouritefood:"rice"},
-        {name:"Taiwo", class:"Nodejs",favouritefood:"friedrice"},
-        {name:"Daniel", class:"Nodejs",favouritefood:"Eba"},
-        {name:"Nafisat", class:"Nodejs",favouritefood:"Yam and Egg"},
-        {name:"Itiayo", class:"Nodejs",favouritefood:"Semo and efo"},
-        {name:"Itunu", class:"Nodejs",favouritefood:"Jollofrice"},
-        {name:"Muiz", class:"Nodejs",favouritefood:"Eba and drawsoup"},
-        {name:"Sheriff", class:"Nodejs",favouritefood:"Amala and ewedu"},
-        {name:"Habib", class:"Nodejs",favouritefood:"Breada and beans"},
-    ]
-})
-})
+app.get("/user", getuser)
 
-app.get("/signup",(req , res)=>{
-    res.render("signup")
-})
+app.get("/signup",displaysignup)
 
 app.get("/login",(req, res)=>{
    res.render("login")
@@ -102,6 +71,7 @@ app.post("/user/signup", async(req, res)=>{
      res.send(error.message)
   }
 })
+
 app.post("/user/login", async(req , res)=>{
 
   try {
@@ -161,7 +131,7 @@ app.post("/deletetodo/:id", async(req ,res)=>{
    }
 })
 
-app.post("/updatetodo/:id",async(req ,res)=>{
+app.post("/completetodo/:id",async(req ,res)=>{
   try {
     const {id} = req.params
     console.log(req.body);
@@ -182,26 +152,48 @@ app.post("/updatetodo/:id",async(req ,res)=>{
   }
 })
 
-
-
-
-const Uri = process.env.MONGODB_URI
-
-const connect = async() =>{
+app.get("/edittodo/:id", async(req , res)=>{
   try {
-  const connection = await mongoose.connect(Uri) 
-  // console.log(connection);
-  if (connection) {
-    console.log("database connected sucessfully");
-  }
-  
+      console.log(req.params);
+    const {id} = req.params
+    const onetodo =  await todomodel.findById(id)
+    console.log(onetodo);
+    if (onetodo) {
+      res.render("edit",{onetodo})
+    }
+   
   } catch (error) {
     console.log(error);
     
   }
-}
-connect()
+})
 
+app.post("/updatetodo/:id",async(req ,res)=>{
+  try {
+    console.log(req.body);
+    const {title , description} = req.body
+    const {id} = req.params
+  const updatetodo =  await todomodel.findByIdAndUpdate(
+      id,
+      {title, description},
+      {new:true}
+    )
+    console.log(updatetodo);
+    if (updatetodo) {
+      res.redirect("/dashboard")
+    }
+    
+  } catch (error) {
+    console.log(error);
+    
+  }
+})
+
+
+
+
+
+connect()
 const port = 8006
 
 app.listen(port,()=>{

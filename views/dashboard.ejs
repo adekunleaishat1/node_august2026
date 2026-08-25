@@ -30,13 +30,17 @@
     <p><%= element.title %></p>
     <p><%= element.description %></p>
 
-   <form action="/updatetodo/<%= element._id %>" method="post">
+   <form action="/completetodo/<%= element._id %>" method="post">
     <input value=<%= element.completed %> name="completed" type="text" hidden>
      <input type="checkbox"  onchange="this.form.submit()" <%= element.completed && "checked" %> >
    </form>
 
     <form action="/deletetodo/<%= element._id  %>" method="post">
        <button>delete</button>
+    </form> 
+
+    <form action="/edittodo/<%= element._id  %>" method="get">
+       <button>edit</button>
     </form> 
     
 <% }) %>
