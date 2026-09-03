@@ -1,4 +1,6 @@
 const usermodel = require("../model/user.model")
+const bcryptjs = require("bcryptjs")
+const sendemailverificationmail = require("../utils/emailVerification")
 
 const Signup =async (req, res) =>{
     try {
@@ -7,8 +9,17 @@ const Signup =async (req, res) =>{
         if (!username || !email || !password) {
          return res.status(400).json({message:"All fields are mandatory", status:false})
         }
-      const newUser =  await usermodel.create(req.body)
+       const hashedPassword =  await bcryptjs.hash(password, 10)
+       console.log(hashedPassword);
+       
+      const newUser =  await usermodel.create({
+        ...req.body,
+        password:hashedPassword
+      })
       if (newUser) {
+       const sentmail =  await sendemailverificationmail(email , username)
+       console.log(sentmail);
+       
          return res.status(200).json({message:"Signup successful", status:true})
         
       }
@@ -29,9 +40,19 @@ const login = async (req , res) =>{
          return res.status(400).json({message:"All fields are mandatory", status:false})
      }
     const existuser = await usermodel.findOne({email})
-    if (existuser && existuser.password == password) {
-     return res.status(200).json({message:"login successful", status:true})
-      
+     
+    if (existuser) {
+
+     const correctPassword = await bcryptjs.compare(password, existuser.password)
+
+     if (correctPassword) {
+      if (existuser.verified) {
+         return res.status(200).json({message:"login successful", status:true})
+      }
+      return res.status(400).json({message:"email is not verified, check your mail.", status:false})
+     }
+
+      return res.status(404).json({message:"user not found", status:false})
     }
       return res.status(404).json({message:"user not found", status:false})
   } catch (error) {
