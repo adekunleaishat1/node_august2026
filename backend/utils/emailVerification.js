@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer")
 
-const SendemailVerificationmail = async (email, username) =>{
+const SendemailVerificationmail = async (email, username,verificationotp) =>{
     const messageTemplate = `
       <!DOCTYPE html>
     <html lang="en">
@@ -39,7 +39,7 @@ const SendemailVerificationmail = async (email, username) =>{
                                         <td align="center">
                                             <div style="background-color: #e3f2fd; border: 2px dashed #1e88e5; border-radius: 10px; padding: 25px 40px; display: inline-block;">
                                                 <span style="font-size: 36px; font-weight: 700; color: #1565c0; letter-spacing: 8px;">
-                                                   
+                                                   ${verificationotp}
                                                 </span>
                                             </div>
                                         </td>
