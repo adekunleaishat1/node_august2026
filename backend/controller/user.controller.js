@@ -4,6 +4,7 @@ const sendemailverificationmail = require("../utils/emailVerification")
 const generateOtp = require("../utils/Otp-generator")
 const otpmodel = require("../model/otp.model")
 const jwt = require("jsonwebtoken")
+const cloudinary = require('../utils/Cloudinary')
 
 const Signup =async (req, res) =>{
     try {
@@ -119,4 +120,29 @@ const Verifytoken = async (req , res) =>{
  }
 }
 
-module.exports = {Signup, login, verifyEmail,Verifytoken}
+const ProfileUpload = async (req , res) =>{
+  try {
+    const {image} = req.body
+    console.log(req.user);
+    const email = req.user
+    if (!image) {
+        return res.status(400).json({message:"image is empty", status:false})
+    }
+    const uploadedimage =   await cloudinary.uploader.upload(image)
+    console.log(uploadedimage);
+  const uploadeddata =   await usermodel.findOneAndUpdate(
+      {email},
+      {profilepicture:uploadedimage.secure_url},
+      {new:true}
+     )
+     console.log(uploadeddata);
+        return res.status(200).json({message:"profile update successful" , status:true})
+     
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({message:error.message, status:false})
+    
+  }
+}
+
+module.exports = {Signup, login, verifyEmail,Verifytoken, ProfileUpload}
