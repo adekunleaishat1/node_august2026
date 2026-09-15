@@ -18,7 +18,6 @@ const Dashboard = () => {
         if (res) {
           setCurrentuser(res.data.currentUser)  
         }
-        
       }).catch((err)=>{
         console.log(err);
         if (err) {

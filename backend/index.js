@@ -3,12 +3,14 @@ const app = express()
 require("dotenv").config()
 const connect = require("./database/db.connect")
 const userrouter = require("./route/user.route")
+const productrouter = require("./route/product.route")
 const cors = require("cors")
 
 // middlewares 
 app.use(cors({origin:"*"}))
 app.use(express.json())
 app.use("/user", userrouter)
+app.use("/product", productrouter)
 
 
 
