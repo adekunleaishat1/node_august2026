@@ -128,11 +128,20 @@ const ProfileUpload = async (req , res) =>{
     if (!image) {
         return res.status(400).json({message:"image is empty", status:false})
     }
-    const uploadedimage =   await cloudinary.uploader.upload(image)
-    console.log(uploadedimage);
-  const uploadeddata =   await usermodel.findOneAndUpdate(
+   const existuser = await usermodel.findOne({email})
+  console.log(existuser);
+    const imageid = existuser.profilepicture?.publicId
+    console.log(imageid , "image puvlic id");
+    
+      if (imageid) {
+        await cloudinary.uploader.destroy(imageid)
+      }
+
+    const uploadedimage = await cloudinary.uploader.upload(image)
+    console.log(uploadedimage,"cloudinaryimage");
+  const uploadeddata = await usermodel.findOneAndUpdate(
       {email},
-      {profilepicture:uploadedimage.secure_url},
+      {profilepicture:{imageurl:uploadedimage.secure_url,publicId:uploadedimage.public_id}},
       {new:true}
      )
      console.log(uploadeddata);

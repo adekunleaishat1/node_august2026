@@ -20,4 +20,21 @@ const addProduct = async (req , res) =>{
   }
 }
 
-module.exports = {addProduct}
+const getallproduct = async (req, res) =>{
+  try {
+    const {page, limit } = req.query
+  //  console.log(page , limit);
+   
+   const skip = (parseInt(page) - 1 ) * limit
+   console.log(skip);
+   
+   const allproduct = await productmodel.find().skip(skip).limit(limit)
+   console.log(allproduct);
+   
+  } catch (error) {
+    console.log(error);
+    
+  }
+}
+
+module.exports = {addProduct,getallproduct}
