@@ -5,6 +5,7 @@ const connect = require("./database/db.connect")
 const userrouter = require("./route/user.route")
 const productrouter = require("./route/product.route")
 const cors = require("cors")
+const socket = require("socket.io")
 
 // middlewares 
 app.use(cors({origin:"*"}))
@@ -19,7 +20,21 @@ app.use("/product", productrouter)
 
 connect()
 const port = 8006
-app.listen(port,()=>{
+const connection = app.listen(port,()=>{
     console.log(`app started at port ${port}`);
     
+})
+
+const io = socket(connection,{
+    cors:{
+        origin:"*"
+    }
+})
+
+io.on("connection",(socket)=>{
+    console.log("a user connected");
+    socket.on("sendchat",(message)=>{
+        console.log(message);
+        socket.emit("resend",message )
+    })
 })
