@@ -38,7 +38,11 @@ const Dashboard = ({socket}) => {
 
     const Sendmessage = () =>{
       // console.log(message);
-      socket.emit("sendchat", message)
+      const chatdetail = {
+        ...message,
+        sender:currentUser._id
+      }
+      socket.emit("sendchat", chatdetail)
     }
 
     useEffect(()=>{
@@ -46,7 +50,17 @@ const Dashboard = ({socket}) => {
          console.log(newmessage);
          setallmessage([...allmessage, newmessage])
        })
+       
     },[allmessage])
+
+    useEffect(()=>{
+      socket.on("sendallmessage",(message)=>{
+        console.log(message);
+        
+        setallmessage(message)
+       })
+    },[allmessage])
+
 
   return (
     <div>
